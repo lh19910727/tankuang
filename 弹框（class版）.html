@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="demo.css" />
+		<script src="drag.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<input type="button" name="btn" id="btn" value="弹框按钮" />
+		<script type="text/javascript">
+			class Dragdelog {
+				constructor(options) {
+					options = options || {}
+						//				如果传入的参数不是对象类型的，把它转成对象
+					if (options.constructor !== Object) {
+						options = {}
+					}
+					this.defaults = {
+						title: '这是一个弹框',
+						content: '这是弹框的内容',
+						left: null,
+						top: null
+					}
+					//default继承options的属性
+					for (var attr in options) {
+						if (options.hasOwnProperty(attr)) {
+							this.defaults[attr] = options[attr]
+						}
+					}
+					//结构初始化
+					this.init();
+					this.position();
+					new Drag({
+						targetEle: this.target,
+						moveEle: this.diaDiv
+					})
+				}
+				init() { //生成结构初始化
+					this.diaDiv = this.creatHtml();
+					this.diaDiv.style.zIndex = 2;
+					document.body.appendChild(this.diaDiv);
+					this.mask = this.createMask();
+					this.mask.style.zIndex = 1
+					document.body.appendChild(this.mask);
+					this.target = document.getElementsByTagName('h3')[0]
+					this.diaDiv = document.getElementsByClassName('full-pop')[0];
+				}
+				position() { //弹框定位
+					var isLeft = this.defaults.left !== null && !isNaN(this.defaults.left);
+					var isTop = this.defaults.top !== null && !isNaN(this.defaults.top);
+					var left = (document.documentElement.clientWidth - this.diaDiv.offsetWidth) / 2;
+					var top = (document.documentElement.clientHeight - this.diaDiv.offsetHeight) / 2;
+					if (isLeft) { //只传入left
+						this.diaDiv.style.left = this.defaults.left + 'px';
+						this.diaDiv.style.top = top + 'px';
+					}
+					if (isTop) { //只传入top
+						this.diaDiv.style.top = this.defaults.top + 'px';
+						this.diaDiv.style.left = left + 'px';
+					}
+					if (isLeft && isTop) { //传入了left和top值
+						this.diaDiv.style.left = this.defaults.left + 'px';
+						this.diaDiv.style.top = this.defaults.top + 'px';
+					}
+					if (!isLeft && !isTop) { //left和top值都为null
+						this.diaDiv.style.top = top + 'px';
+						this.diaDiv.style.left = left + 'px';
+					}
+				}
+				creatHtml() { //创建弹框结构
+					var diaDiv = document.createElement("div");
+					diaDiv.className = "full-pop";
+					var diaHtml = `<h3>
+						<p class="title">${this.defaults.title}</p>
+						<a href="javascript:void(0);" class="close" title="关闭">×</a>
+						</h3>
+						<div class="content">
+							${this.defaults.content}
+						</div>
+						<div class="pop-btns">
+							<span class="error"></span>
+							<a href="javascript:void(0)" class="confirm">确定</a>
+							<a href="javascript:void(0)" class="cancel">取消</a>
+						</div>`;
+					diaDiv.innerHTML = diaHtml;
+					return diaDiv;
+				}
+				createMask() { //创建mask遮罩层结构
+					var mask = document.createElement("div");
+					mask.style.cssText = "width:100%;height:100%;background:#000;opacity: .5;position:fixed;left:0;top:0;z-index:99;";
+					return mask;
+				}
+				
+			}
+			
+			btn.onclick = function() {
+				new Dragdelog({
+					left:200
+				})
+			}
+		</script>
+	</body>
+
+</html>
